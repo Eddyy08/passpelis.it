@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verifica Credenziale — Archivio Centrale Pass Pelis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#0f172a;--blue-mid:#1e3a5f;--blue-accent:#2563eb;--blue-light:#eff6ff;
+  --green:#15803d;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-400:#94a3b8;
+  --gray-600:#475569;--gray-700:#334155;--gray-900:#0f172a;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-xl:20px
+}
+body{background:#f1f5f9;font-family:'Inter',sans-serif;min-height:100vh;padding:0}
+
+.topbar{background:var(--blue);padding:12px 32px;display:flex;align-items:center;gap:12px}
+.topbar-emblem{width:28px;height:28px;border:1.5px solid rgba(255,255,255,.25);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.topbar-emblem svg{width:16px;height:16px;stroke:#93c5fd;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.topbar-name{font-size:13px;font-weight:500;color:rgba(255,255,255,.9);letter-spacing:.03em}
+.topbar-sep{width:1px;height:16px;background:rgba(255,255,255,.15);margin:0 4px}
+.topbar-sub{font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.04em}
+
+.hero{background:var(--blue-mid);padding:40px 32px 36px;border-bottom:1px solid rgba(255,255,255,.06)}
+.hero-eyebrow{font-size:11px;font-weight:600;color:#93c5fd;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.hero-title{font-size:28px;font-weight:700;color:#fff;line-height:1.25;margin-bottom:6px}
+.hero-sub{font-size:14px;color:rgba(255,255,255,.5);font-weight:400}
+.hero-btn-wrap{margin-top:22px}
+.verify-btn{background:var(--blue-accent);color:#fff;border:none;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:8px;transition:opacity .15s}
+.verify-btn:hover{opacity:.9}
+.verify-btn svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.content{max-width:720px;margin:0 auto;padding:32px 24px 48px}
+.section-label{font-size:11px;font-weight:600;color:var(--gray-400);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+
+.result-card{background:#fff;border-radius:var(--radius-xl);border:1px solid var(--gray-200);overflow:hidden;margin-bottom:20px}
+.result-top{padding:28px 28px 24px;border-bottom:1px solid var(--gray-100)}
+.valid-pill{display:inline-flex;align-items:center;gap:7px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:999px;padding:6px 14px 6px 10px;margin-bottom:18px}
+.valid-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.valid-label{font-size:13px;font-weight:600;color:var(--green)}
+.result-heading{font-size:22px;font-weight:700;color:var(--gray-900);margin-bottom:4px}
+.result-desc{font-size:14px;color:var(--gray-600);line-height:1.65}
+
+.meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--gray-100)}
+.meta-cell{padding:18px 22px;border-right:1px solid var(--gray-100)}
+.meta-cell:last-child{border-right:none}
+.meta-label{font-size:11px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.meta-value{font-size:14px;font-weight:600;color:var(--gray-900)}
+
+.checks-card{background:#fff;border-radius:var(--radius-xl);border:1px solid var(--gray-200);overflow:hidden;margin-bottom:20px}
+.checks-head{padding:18px 28px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+.checks-title{font-size:14px;font-weight:600;color:var(--gray-900)}
+.checks-badge{font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid var(--green-border);border-radius:999px;padding:3px 10px}
+.check-row{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--gray-100);font-size:13px}
+.check-row:last-child{border-bottom:none}
+.check-left{display:flex;align-items:center;gap:10px;color:var(--gray-700)}
+.check-icon{width:28px;height:28px;border-radius:var(--radius-sm);background:var(--gray-50);border:1px solid var(--gray-200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.check-icon svg{width:13px;height:13px;stroke:var(--gray-400);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.check-right{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--green)}
+.check-right svg{width:13px;height:13px;stroke:var(--green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+.info-card{background:#fff;border-radius:var(--radius-xl);border:1px solid var(--gray-200);padding:28px;margin-bottom:20px}
+.info-card h2{font-size:17px;font-weight:700;color:var(--gray-900);margin-bottom:14px}
+.info-card p{font-size:14px;color:var(--gray-600);line-height:1.75;margin-bottom:12px}
+.info-card h3{font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.08em;margin:20px 0 10px}
+.rule-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:13px;color:var(--gray-700);line-height:1.6}
+.rule-item:last-of-type{border-bottom:none}
+.rule-num{flex-shrink:0;width:20px;height:20px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--blue-accent);margin-top:1px}
+.note-box{background:var(--gray-50);border-radius:var(--radius-md);border:1px solid var(--gray-200);padding:14px 16px;margin-top:16px;font-size:13px;color:var(--gray-600);line-height:1.7}
+
+.parish-link{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-xl);padding:20px 24px;text-decoration:none;transition:border-color .15s}
+.parish-link:hover{border-color:#93c5fd}
+.parish-icon{width:42px;height:42px;background:var(--blue-light);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.parish-icon svg{width:20px;height:20px;stroke:var(--blue-accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.parish-name{font-size:15px;font-weight:600;color:var(--gray-900)}
+.parish-url{font-size:12px;color:var(--gray-400);margin-top:2px}
+.parish-arrow{margin-left:auto;color:var(--gray-400)}
+.parish-arrow svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.site-footer{background:var(--blue);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer-left{font-size:12px;color:rgba(255,255,255,.35)}
+.footer-right{font-size:12px;color:rgba(255,255,255,.25)}
+
+#loading-screen{background:#f1f5f9;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.load-emblem{width:56px;height:56px;background:var(--blue);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.load-emblem svg{width:28px;height:28px;stroke:#93c5fd;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.load-title{font-size:16px;font-weight:600;color:var(--gray-900)}
+.load-msg{font-size:13px;color:var(--gray-400);min-height:18px;text-align:center}
+.load-bar-wrap{width:240px;height:3px;background:var(--gray-200);border-radius:2px;overflow:hidden}
+.load-bar{height:100%;width:0%;background:var(--blue-accent);border-radius:2px;transition:width .06s linear}
+#main-page{display:none}
+
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.85);display:none;align-items:center;justify-content:center;z-index:99999;padding:16px}
+.modal.open{display:flex}
+.modal-box{width:min(480px,100%);background:#fff;border-radius:var(--radius-xl);padding:28px;position:relative}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--gray-100);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--gray-600);line-height:1}
+.modal-close:hover{background:var(--gray-200)}
+.modal-title{font-size:17px;font-weight:700;color:var(--gray-900);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--gray-400);margin-bottom:20px}
+#reader{border-radius:var(--radius-md);overflow:hidden;background:var(--gray-100)}
+.divider{display:flex;align-items:center;gap:12px;margin:18px 0}
+.divider-line{flex:1;height:1px;background:var(--gray-200)}
+.divider-text{font-size:12px;color:var(--gray-400);font-weight:500}
+.manual-input{width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-md);font-size:15px;font-family:'Inter',sans-serif;color:var(--gray-900);outline:none;transition:border-color .15s}
+.manual-input:focus{border-color:var(--blue-accent)}
+.manual-input::placeholder{color:var(--gray-400)}
+.modal-verify-btn{margin-top:12px;width:100%;background:var(--blue-accent);color:#fff;border:none;padding:13px;border-radius:var(--radius-md);font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s}
+.modal-verify-btn:hover{opacity:.9}
+.error-msg{margin-top:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius-md);padding:10px 14px;font-size:13px;color:#dc2626;display:none}
+.error-msg.visible{display:block}
+
+/* Banner configurazione */
+.config-banner{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius-md);padding:14px 18px;margin-bottom:20px;font-size:13px;color:#92400e;display:none}
+.config-banner.visible{display:block}
+
+@media(max-width:600px){
+  .meta-grid{grid-template-columns:1fr 1fr}
+  .meta-cell{border-bottom:1px solid var(--gray-100)}
+  .topbar,.hero{padding-left:16px;padding-right:16px}
+  .content{padding:20px 14px 40px}
+  .check-row{padding:12px 18px}
+  .result-top,.checks-head{padding-left:18px;padding-right:18px}
+}
+</style>
+</head>
+<body>
+
+<div id="loading-screen">
+  <div class="load-emblem">
+    <svg viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg>
+  </div>
+  <div class="load-title">Archivio Centrale Pass Pelis</div>
+  <div class="load-bar-wrap"><div class="load-bar" id="bar"></div></div>
+  <div class="load-msg" id="load-msg">Connessione all'archivio...</div>
+</div>
+
+<div id="main-page">
+  <div class="topbar">
+    <div class="topbar-emblem">
+      <svg viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg>
+    </div>
+    <span class="topbar-name">Ufficio Centrale Certificazioni</span>
+    <div class="topbar-sep"></div>
+    <span class="topbar-sub">PORTALE VERIFICA DOCUMENTI</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Sistema di verifica credenziali</div>
+    <div class="hero-title">Archivio Centrale Pass Pelis</div>
+    <div class="hero-sub">Portale ufficiale di autenticazione e validazione documentale</div>
+    <div class="hero-btn-wrap">
+      <button class="verify-btn" id="openScanner">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3m0 4h4m-4-4v4m0 0h-3"/></svg>
+        Verifica Pass Pelis
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="config-banner" id="configBanner">
+      ⚠️ <strong>Configurazione richiesta:</strong> inserisci il link del tuo Google Sheets nella variabile <code>SHEETS_URL</code> in fondo al file HTML.
+    </div>
+
+    <div class="section-label">Esito verifica</div>
+
+    <div class="result-card">
+      <div class="result-top">
+        <div class="valid-pill">
+          <div class="valid-dot"></div>
+          <div class="valid-label" id="pill-label">In attesa di verifica</div>
+        </div>
+        <div class="result-heading" id="result-nome">Nessuna credenziale verificata</div>
+        <div class="result-desc" id="result-desc">Premi il pulsante "Verifica Pass Pelis" in alto per scansionare un QR code o inserire un codice manualmente.</div>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Protocollo</div>
+          <div class="meta-value" id="meta-protocollo">—</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Stato</div>
+          <div class="meta-value" id="meta-stato">—</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Tipo Pass</div>
+          <div class="meta-value" id="meta-tipo">—</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Sincronizzazione</div>
+          <div class="meta-value" id="ts" style="font-size:12px">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="checks-card">
+      <div class="checks-head">
+        <span class="checks-title">Registro verifiche</span>
+        <span class="checks-badge">4 / 4 completate</span>
+      </div>
+      <div class="check-row">
+        <div class="check-left">
+          <div class="check-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg></div>
+          Registrazione documento
+        </div>
+        <div class="check-right"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Completata</div>
+      </div>
+      <div class="check-row">
+        <div class="check-left">
+          <div class="check-icon"><svg viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg></div>
+          Verifica firma digitale
+        </div>
+        <div class="check-right"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Completata</div>
+      </div>
+      <div class="check-row">
+        <div class="check-left">
+          <div class="check-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          Controllo validità temporale
+        </div>
+        <div class="check-right"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Completato</div>
+      </div>
+      <div class="check-row">
+        <div class="check-left">
+          <div class="check-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          Sincronizzazione archivio centrale
+        </div>
+        <div class="check-right"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Completata</div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:32px">Informazioni sul documento</div>
+
+    <div class="info-card">
+      <h2>Cos'è il Pass Pelis?</h2>
+      <p>Il Pass Pelis è una credenziale non ufficiale nata all'interno del gruppo giovanile come riconoscimento simbolico di privilegi, abilità, imprese memorabili o caratteristiche particolarmente distintive dei suoi possessori.</p>
+      <p>Ogni Pass Pelis è associato a una specifica autorizzazione, beneficio o titolo, definito al momento dell'emissione e riportato direttamente sulla credenziale. Le autorizzazioni possono riguardare attività, situazioni o contesti particolari e hanno valore esclusivamente all'interno delle iniziative e delle dinamiche del gruppo che le ha generate.</p>
+      <h3>Regolamento generale</h3>
+      <div class="rule-item"><div class="rule-num">1</div>Ogni Pass Pelis è personale e non trasferibile.</div>
+      <div class="rule-item"><div class="rule-num">2</div>I privilegi indicati sulla credenziale sono validi esclusivamente nei limiti stabiliti dall'emittente.</div>
+      <div class="rule-item"><div class="rule-num">3</div>L'emissione, il rinnovo, la sospensione o la revoca di un Pass Pelis possono avvenire in qualsiasi momento.</div>
+      <div class="rule-item"><div class="rule-num">4</div>La presenza del Pass non garantisce alcun diritto reale, legale o economico.</div>
+      <div class="rule-item"><div class="rule-num">5</div>Eventuali controversie vengono risolte tramite decisione insindacabile dell'autorità competente.</div>
+      <div class="note-box">Il Pass Pelis costituisce una tradizione interna del gruppo e rappresenta una forma di riconoscimento simbolico, ideata con finalità aggregative, ricreative e commemorative.</div>
+    </div>
+
+    <div class="section-label" style="margin-top:32px">Ente emittente</div>
+
+    <a class="parish-link" href="https://www.parrocchiazogno.it/" target="_blank" rel="noopener">
+      <div class="parish-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+      </div>
+      <div>
+        <div class="parish-name">Parrocchia di Zogno</div>
+        <div class="parish-url">parrocchiazogno.it</div>
+      </div>
+      <div class="parish-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </a>
+  </div>
+
+  <div class="site-footer">
+    <span class="footer-left">Sistema documentale Pass Pelis v4.1 &nbsp;·&nbsp; © Ufficio Centrale Certificazioni</span>
+    <span class="footer-right" id="footer-ts"></span>
+  </div>
+</div>
+
+<!-- MODAL SCANNER -->
+<div class="modal" id="scannerModal">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose" title="Chiudi">×</button>
+    <div class="modal-title">Verifica Pass Pelis</div>
+    <div class="modal-sub">Inquadra il QR code oppure inserisci il codice manualmente</div>
+    <div id="reader"></div>
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-text">oppure</div>
+      <div class="divider-line"></div>
+    </div>
+    <input id="manualCode" class="manual-input" placeholder="Inserisci codice (es. P01)" autocomplete="off" spellcheck="false">
+    <button class="modal-verify-btn" id="manualVerifyBtn">Verifica</button>
+    <div class="error-msg" id="errorMsg">Codice non trovato nell'archivio. Controlla e riprova.</div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ▼▼▼  UNICA COSA DA MODIFICARE  ▼▼▼
+   Incolla qui il link del tuo Google Sheets (vedi guida).
+   Lascia SHEETS_URL = "" se non l'hai ancora configurato.
+═══════════════════════════════════════════════════════════ */
+const SHEETS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNtWtLV6X4JXGMqjMp8Pm8qcN320yoUFvbD5byrlA7GFmoBqCj0Ehx3Fh_HdDYAzmPyouZIaVnk1I/pub?gid=0&single=true&output=csv";
+/* ═══════════════════════════════════════════════════════════
+   ▲▲▲  FINE CONFIGURAZIONE  ▲▲▲
+═══════════════════════════════════════════════════════════ */
+
+// Database caricato da Sheets (o vuoto)
+let archivio = {};
+
+// Carica i dati da Google Sheets all'avvio
+async function caricaArchivio() {
+  if (!SHEETS_URL) {
+    document.getElementById("configBanner").classList.add("visible");
+    return;
+  }
+  try {
+    const res  = await fetch(SHEETS_URL);
+    const text = await res.text();
+    const righe = text.trim().split("\n").slice(1); // salta intestazione
+    righe.forEach(riga => {
+      // Gestisce virgole dentro campi tra virgolette
+      const col = parseCSVRow(riga);
+      if (col.length >= 4) {
+        const codice = col[0].trim().toUpperCase();
+        archivio[codice] = {
+          nome:       col[1].trim(),
+          pass:       col[2].trim(),
+          protocollo: col[3].trim(),
+          stato:      col[4] ? col[4].trim() : "Attivo"
+        };
+      }
+    });
+  } catch(e) {
+    console.warn("Impossibile caricare Sheets:", e);
+    document.getElementById("configBanner").classList.add("visible");
+    document.getElementById("configBanner").textContent =
+      "⚠️ Impossibile connettersi al database. Controlla che il link Sheets sia corretto e che il foglio sia pubblico.";
+  }
+}
+
+function parseCSVRow(row) {
+  const result = [];
+  let cur = "", inQ = false;
+  for (let i = 0; i < row.length; i++) {
+    const c = row[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { result.push(cur); cur = ""; }
+    else { cur += c; }
+  }
+  result.push(cur);
+  return result;
+}
+
+/* ── LOADING BAR ── */
+const msgs = ["Connessione all'archivio...","Verifica firma digitale...","Controllo validità...","Sincronizzazione completata."];
+let p=0, mi=0;
+const bar     = document.getElementById("bar");
+const loadMsg = document.getElementById("load-msg");
+
+// Avvia caricamento Sheets in parallelo con la barra
+caricaArchivio();
+
+const iv = setInterval(() => {
+  p += 1.2;
+  bar.style.width = Math.min(p, 100) + "%";
+  const idx = Math.floor((p / 100) * msgs.length);
+  if (idx < msgs.length && idx !== mi) { mi = idx; loadMsg.textContent = msgs[mi]; }
+  if (p >= 100) {
+    clearInterval(iv);
+    setTimeout(() => {
+      document.getElementById("loading-screen").style.display = "none";
+      document.getElementById("main-page").style.display = "block";
+      const fmt = new Date().toLocaleString("it-IT");
+      document.getElementById("ts").textContent        = fmt;
+      document.getElementById("footer-ts").textContent = "Ultimo aggiornamento: " + fmt;
+    }, 400);
+  }
+}, 55);
+
+/* ── SCANNER ── */
+const modal    = document.getElementById("scannerModal");
+const manualIn = document.getElementById("manualCode");
+const errorMsg = document.getElementById("errorMsg");
+let scanner = null, scannerRunning = false;
+
+document.getElementById("openScanner").addEventListener("click", apriScanner);
+document.getElementById("modalClose").addEventListener("click", chiudiModal);
+document.getElementById("manualVerifyBtn").addEventListener("click", verificaManuale);
+manualIn.addEventListener("keydown", e => { if (e.key === "Enter") verificaManuale(); });
+
+function apriScanner() {
+  modal.classList.add("open");
+  errorMsg.classList.remove("visible");
+  manualIn.value = "";
+  if (!scanner) scanner = new Html5Qrcode("reader");
+  if (!scannerRunning) {
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 220, height: 220 } },
+      (decodedText) => { fermaScanner(() => caricaPass(decodedText.trim().toUpperCase())); },
+      () => {}
+    ).then(() => { scannerRunning = true; }).catch(err => console.warn("Camera:", err));
+  }
+}
+
+function fermaScanner(cb) {
+  if (scanner && scannerRunning) {
+    scanner.stop().then(() => { scannerRunning = false; if(cb) cb(); }).catch(() => { scannerRunning = false; if(cb) cb(); });
+  } else { if(cb) cb(); }
+}
+
+function chiudiModal() { fermaScanner(() => modal.classList.remove("open")); }
+
+function verificaManuale() {
+  const codice = manualIn.value.trim().toUpperCase();
+  if (!codice) return;
+  fermaScanner(() => caricaPass(codice));
+}
+
+function caricaPass(codice) {
+  const dati = archivio[codice];
+  if (!dati) {
+    errorMsg.classList.add("visible");
+    if (modal.classList.contains("open") && scanner && !scannerRunning) {
+      scanner.start({ facingMode:"environment" }, { fps:10, qrbox:{width:220,height:220} },
+        (dt) => { fermaScanner(() => caricaPass(dt.trim().toUpperCase())); }, () => {}
+      ).then(() => { scannerRunning = true; });
+    }
+    return;
+  }
+
+  document.getElementById("result-nome").textContent  = dati.nome;
+  document.getElementById("result-desc").textContent  = `Titolare: ${dati.nome} — ${dati.pass}. Credenziale registrata nell'archivio centrale e conforme ai requisiti di validità. Nessuna anomalia rilevata.`;
+  document.getElementById("meta-protocollo").textContent = dati.protocollo;
+  document.getElementById("meta-stato").textContent      = dati.stato;
+  document.getElementById("meta-stato").style.color      = dati.stato === "Attivo" ? "var(--green)" : "var(--gray-600)";
+  document.getElementById("meta-tipo").textContent       = dati.pass;
+  document.getElementById("pill-label").textContent      = "Documento valido";
+
+  const fmt = new Date().toLocaleString("it-IT");
+  document.getElementById("ts").textContent        = fmt;
+  document.getElementById("footer-ts").textContent = "Ultimo aggiornamento: " + fmt;
+
+  modal.classList.remove("open");
+  errorMsg.classList.remove("visible");
+  document.querySelector(".result-card").scrollIntoView({ behavior:"smooth", block:"start" });
+}
+</script>
+</body>
+</html>
