@@ -12,6 +12,8 @@
 :root{
   --blue:#0f172a;--blue-mid:#1e3a5f;--blue-accent:#2563eb;--blue-light:#eff6ff;
   --green:#15803d;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --orange:#c2410c;--orange-bg:#fff7ed;--orange-border:#fed7aa;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
   --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-400:#94a3b8;
   --gray-600:#475569;--gray-700:#334155;--gray-900:#0f172a;
   --radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-xl:20px
@@ -39,17 +41,41 @@ body{background:#f1f5f9;font-family:'Inter',sans-serif;min-height:100vh;padding:
 
 .result-card{background:#fff;border-radius:var(--radius-xl);border:1px solid var(--gray-200);overflow:hidden;margin-bottom:20px}
 .result-top{padding:28px 28px 24px;border-bottom:1px solid var(--gray-100)}
-.valid-pill{display:inline-flex;align-items:center;gap:7px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:999px;padding:6px 14px 6px 10px;margin-bottom:18px}
-.valid-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
-.valid-label{font-size:13px;font-weight:600;color:var(--green)}
-.result-heading{font-size:22px;font-weight:700;color:var(--gray-900);margin-bottom:4px}
+
+/* pill colori dinamici */
+.valid-pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:6px 14px 6px 10px;margin-bottom:18px}
+.valid-pill.verde{background:var(--green-bg);border:1px solid var(--green-border)}
+.valid-pill.arancione{background:var(--orange-bg);border:1px solid var(--orange-border)}
+.valid-pill.rosso{background:var(--red-bg);border:1px solid var(--red-border)}
+.valid-pill.neutro{background:var(--gray-100);border:1px solid var(--gray-200)}
+.valid-dot{width:7px;height:7px;border-radius:50%}
+.valid-pill.verde .valid-dot{background:var(--green)}
+.valid-pill.arancione .valid-dot{background:var(--orange)}
+.valid-pill.rosso .valid-dot{background:var(--red)}
+.valid-pill.neutro .valid-dot{background:var(--gray-400)}
+.valid-label{font-size:13px;font-weight:600}
+.valid-pill.verde .valid-label{color:var(--green)}
+.valid-pill.arancione .valid-label{color:var(--orange)}
+.valid-pill.rosso .valid-label{color:var(--red)}
+.valid-pill.neutro .valid-label{color:var(--gray-600)}
+
+.result-heading{font-size:22px;font-weight:700;color:var(--gray-900);margin-bottom:2px}
+.result-subname{font-size:14px;color:var(--gray-400);margin-bottom:8px;font-style:italic}
 .result-desc{font-size:14px;color:var(--gray-600);line-height:1.65}
 
 .meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--gray-100)}
-.meta-cell{padding:18px 22px;border-right:1px solid var(--gray-100)}
+.meta-cell{padding:16px 20px;border-right:1px solid var(--gray-100)}
 .meta-cell:last-child{border-right:none}
 .meta-label{font-size:11px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
-.meta-value{font-size:14px;font-weight:600;color:var(--gray-900)}
+.meta-value{font-size:13px;font-weight:600;color:var(--gray-900)}
+.meta-value.verde{color:var(--green)}
+.meta-value.arancione{color:var(--orange)}
+.meta-value.rosso{color:var(--red)}
+
+.extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--gray-100)}
+.extra-cell{padding:14px 20px;border-right:1px solid var(--gray-100)}
+.extra-cell:last-child{border-right:none}
+.extra-cell.full{grid-column:1/-1;border-right:none}
 
 .checks-card{background:#fff;border-radius:var(--radius-xl);border:1px solid var(--gray-200);overflow:hidden;margin-bottom:20px}
 .checks-head{padding:18px 28px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
@@ -112,13 +138,13 @@ body{background:#f1f5f9;font-family:'Inter',sans-serif;min-height:100vh;padding:
 .modal-verify-btn:hover{opacity:.9}
 .error-msg{margin-top:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius-md);padding:10px 14px;font-size:13px;color:#dc2626;display:none}
 .error-msg.visible{display:block}
-
-/* Banner configurazione */
 .config-banner{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius-md);padding:14px 18px;margin-bottom:20px;font-size:13px;color:#92400e;display:none}
 .config-banner.visible{display:block}
 
 @media(max-width:600px){
   .meta-grid{grid-template-columns:1fr 1fr}
+  .extra-grid{grid-template-columns:1fr}
+  .extra-cell{border-right:none;border-bottom:1px solid var(--gray-100)}
   .meta-cell{border-bottom:1px solid var(--gray-100)}
   .topbar,.hero{padding-left:16px;padding-right:16px}
   .content{padding:20px 14px 40px}
@@ -169,29 +195,54 @@ body{background:#f1f5f9;font-family:'Inter',sans-serif;min-height:100vh;padding:
 
     <div class="result-card">
       <div class="result-top">
-        <div class="valid-pill">
+        <div class="valid-pill neutro" id="statusPill">
           <div class="valid-dot"></div>
           <div class="valid-label" id="pill-label">In attesa di verifica</div>
         </div>
         <div class="result-heading" id="result-nome">Nessuna credenziale verificata</div>
+        <div class="result-subname" id="result-soprannome"></div>
         <div class="result-desc" id="result-desc">Premi il pulsante "Verifica Pass Pelis" in alto per scansionare un QR code o inserire un codice manualmente.</div>
       </div>
+
       <div class="meta-grid">
         <div class="meta-cell">
-          <div class="meta-label">Protocollo</div>
-          <div class="meta-value" id="meta-protocollo">—</div>
+          <div class="meta-label">Codice</div>
+          <div class="meta-value" id="meta-codice">—</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Categoria</div>
+          <div class="meta-value" id="meta-categoria">—</div>
         </div>
         <div class="meta-cell">
           <div class="meta-label">Stato</div>
           <div class="meta-value" id="meta-stato">—</div>
         </div>
         <div class="meta-cell">
-          <div class="meta-label">Tipo Pass</div>
-          <div class="meta-value" id="meta-tipo">—</div>
-        </div>
-        <div class="meta-cell">
           <div class="meta-label">Sincronizzazione</div>
           <div class="meta-value" id="ts" style="font-size:12px">—</div>
+        </div>
+      </div>
+
+      <div class="extra-grid">
+        <div class="extra-cell">
+          <div class="meta-label">Data emissione</div>
+          <div class="meta-value" id="meta-emissione">—</div>
+        </div>
+        <div class="extra-cell">
+          <div class="meta-label">Data scadenza</div>
+          <div class="meta-value" id="meta-scadenza">—</div>
+        </div>
+        <div class="extra-cell">
+          <div class="meta-label">Emesso da</div>
+          <div class="meta-value" id="meta-emesso">—</div>
+        </div>
+        <div class="extra-cell">
+          <div class="meta-label">Descrizione</div>
+          <div class="meta-value" id="meta-descrizione" style="font-weight:400;color:var(--gray-600)">—</div>
+        </div>
+        <div class="extra-cell full">
+          <div class="meta-label">Note</div>
+          <div class="meta-value" id="meta-note" style="font-weight:400;color:var(--gray-600)">—</div>
         </div>
       </div>
     </div>
@@ -261,7 +312,7 @@ body{background:#f1f5f9;font-family:'Inter',sans-serif;min-height:100vh;padding:
   </div>
 
   <div class="site-footer">
-    <span class="footer-left">Sistema documentale Pass Pelis v4.1 &nbsp;·&nbsp; © Ufficio Centrale Certificazioni</span>
+    <span class="footer-left">Sistema documentale Pass Pelis v4.2 &nbsp;·&nbsp; © Ufficio Centrale Certificazioni</span>
     <span class="footer-right" id="footer-ts"></span>
   </div>
 </div>
@@ -285,20 +336,24 @@ body{background:#f1f5f9;font-family:'Inter',sans-serif;min-height:100vh;padding:
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
-   ▼▼▼  UNICA COSA DA MODIFICARE  ▼▼▼
-   Incolla qui il link del tuo Google Sheets (vedi guida).
-   Lascia SHEETS_URL = "" se non l'hai ancora configurato.
-═══════════════════════════════════════════════════════════ */
-const SHEETS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNtWtLV6X4JXGMqjMp8Pm8qcN320yoUFvbD5byrlA7GFmoBqCj0Ehx3Fh_HdDYAzmPyouZIaVnk1I/pub?gid=0&single=true&output=csv";
-/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════
+   ▼▼▼  INCOLLA QUI IL TUO LINK GOOGLE SHEETS CSV  ▼▼▼
+═══════════════════════════════════════════════════ */
+const SHEETS_URL = "";
+/* ═══════════════════════════════════════════════════
    ▲▲▲  FINE CONFIGURAZIONE  ▲▲▲
-═══════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════ */
 
-// Database caricato da Sheets (o vuoto)
+/*
+  STRUTTURA COLONNE GOOGLE SHEETS (ordine esatto):
+  A: Codice | B: Soprannome | C: Nome | D: Cognome
+  E: Categoria | F: Note | G: Emesso da
+  H: Data emissione | I: Data scadenza
+  J: Descrizione | K: Stato (A=Attivo, S=Sospeso, R=Revocato)
+*/
+
 let archivio = {};
 
-// Carica i dati da Google Sheets all'avvio
 async function caricaArchivio() {
   if (!SHEETS_URL) {
     document.getElementById("configBanner").classList.add("visible");
@@ -307,25 +362,30 @@ async function caricaArchivio() {
   try {
     const res  = await fetch(SHEETS_URL);
     const text = await res.text();
-    const righe = text.trim().split("\n").slice(1); // salta intestazione
+    const righe = text.trim().split("\n").slice(1);
     righe.forEach(riga => {
-      // Gestisce virgole dentro campi tra virgolette
       const col = parseCSVRow(riga);
-      if (col.length >= 4) {
+      if (col.length >= 1 && col[0].trim()) {
         const codice = col[0].trim().toUpperCase();
         archivio[codice] = {
-          nome:       col[1].trim(),
-          pass:       col[2].trim(),
-          protocollo: col[3].trim(),
-          stato:      col[4] ? col[4].trim() : "Attivo"
+          soprannome:   col[1]  ? col[1].trim()  : "",
+          nome:         col[2]  ? col[2].trim()  : "",
+          cognome:      col[3]  ? col[3].trim()  : "",
+          categoria:    col[4]  ? col[4].trim()  : "—",
+          note:         col[5]  ? col[5].trim()  : "",
+          emessoDa:     col[6]  ? col[6].trim()  : "—",
+          dataEmissione:col[7]  ? col[7].trim()  : "—",
+          dataScadenza: col[8]  ? col[8].trim()  : "—",
+          descrizione:  col[9]  ? col[9].trim()  : "",
+          stato:        col[10] ? col[10].trim().toUpperCase() : "A"
         };
       }
     });
   } catch(e) {
-    console.warn("Impossibile caricare Sheets:", e);
-    document.getElementById("configBanner").classList.add("visible");
-    document.getElementById("configBanner").textContent =
-      "⚠️ Impossibile connettersi al database. Controlla che il link Sheets sia corretto e che il foglio sia pubblico.";
+    console.warn("Sheets error:", e);
+    const b = document.getElementById("configBanner");
+    b.classList.add("visible");
+    b.textContent = "⚠️ Impossibile connettersi al database. Controlla che il link Sheets sia corretto e che il foglio sia pubblico.";
   }
 }
 
@@ -342,28 +402,32 @@ function parseCSVRow(row) {
   return result;
 }
 
-/* ── LOADING BAR ── */
+function statoInfo(s) {
+  if (s === "A") return { classe: "verde",    testo: "Attivo",   label: "Documento valido" };
+  if (s === "S") return { classe: "arancione", testo: "Sospeso",  label: "Documento sospeso" };
+  if (s === "R") return { classe: "rosso",    testo: "Revocato", label: "Documento revocato" };
+  return           { classe: "neutro",    testo: s,          label: "Stato sconosciuto" };
+}
+
+/* ── LOADING ── */
 const msgs = ["Connessione all'archivio...","Verifica firma digitale...","Controllo validità...","Sincronizzazione completata."];
 let p=0, mi=0;
 const bar     = document.getElementById("bar");
 const loadMsg = document.getElementById("load-msg");
-
-// Avvia caricamento Sheets in parallelo con la barra
 caricaArchivio();
-
 const iv = setInterval(() => {
   p += 1.2;
-  bar.style.width = Math.min(p, 100) + "%";
-  const idx = Math.floor((p / 100) * msgs.length);
-  if (idx < msgs.length && idx !== mi) { mi = idx; loadMsg.textContent = msgs[mi]; }
+  bar.style.width = Math.min(p,100)+"%";
+  const idx = Math.floor((p/100)*msgs.length);
+  if (idx < msgs.length && idx !== mi) { mi=idx; loadMsg.textContent=msgs[mi]; }
   if (p >= 100) {
     clearInterval(iv);
     setTimeout(() => {
-      document.getElementById("loading-screen").style.display = "none";
-      document.getElementById("main-page").style.display = "block";
+      document.getElementById("loading-screen").style.display="none";
+      document.getElementById("main-page").style.display="block";
       const fmt = new Date().toLocaleString("it-IT");
-      document.getElementById("ts").textContent        = fmt;
-      document.getElementById("footer-ts").textContent = "Ultimo aggiornamento: " + fmt;
+      document.getElementById("ts").textContent = fmt;
+      document.getElementById("footer-ts").textContent = "Ultimo aggiornamento: "+fmt;
     }, 400);
   }
 }, 55);
@@ -377,7 +441,7 @@ let scanner = null, scannerRunning = false;
 document.getElementById("openScanner").addEventListener("click", apriScanner);
 document.getElementById("modalClose").addEventListener("click", chiudiModal);
 document.getElementById("manualVerifyBtn").addEventListener("click", verificaManuale);
-manualIn.addEventListener("keydown", e => { if (e.key === "Enter") verificaManuale(); });
+manualIn.addEventListener("keydown", e => { if (e.key==="Enter") verificaManuale(); });
 
 function apriScanner() {
   modal.classList.add("open");
@@ -386,17 +450,17 @@ function apriScanner() {
   if (!scanner) scanner = new Html5Qrcode("reader");
   if (!scannerRunning) {
     scanner.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: { width: 220, height: 220 } },
-      (decodedText) => { fermaScanner(() => caricaPass(decodedText.trim().toUpperCase())); },
+      { facingMode:"environment" },
+      { fps:10, qrbox:{width:220,height:220} },
+      (dt) => { fermaScanner(() => caricaPass(dt.trim().toUpperCase())); },
       () => {}
-    ).then(() => { scannerRunning = true; }).catch(err => console.warn("Camera:", err));
+    ).then(() => { scannerRunning=true; }).catch(e => console.warn("Camera:",e));
   }
 }
 
 function fermaScanner(cb) {
   if (scanner && scannerRunning) {
-    scanner.stop().then(() => { scannerRunning = false; if(cb) cb(); }).catch(() => { scannerRunning = false; if(cb) cb(); });
+    scanner.stop().then(() => { scannerRunning=false; if(cb) cb(); }).catch(() => { scannerRunning=false; if(cb) cb(); });
   } else { if(cb) cb(); }
 }
 
@@ -409,32 +473,55 @@ function verificaManuale() {
 }
 
 function caricaPass(codice) {
-  const dati = archivio[codice];
-  if (!dati) {
+  const d = archivio[codice];
+  if (!d) {
     errorMsg.classList.add("visible");
     if (modal.classList.contains("open") && scanner && !scannerRunning) {
-      scanner.start({ facingMode:"environment" }, { fps:10, qrbox:{width:220,height:220} },
-        (dt) => { fermaScanner(() => caricaPass(dt.trim().toUpperCase())); }, () => {}
-      ).then(() => { scannerRunning = true; });
+      scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:220,height:220}},
+        (dt) => { fermaScanner(() => caricaPass(dt.trim().toUpperCase())); }, ()=>{}
+      ).then(()=>{ scannerRunning=true; });
     }
     return;
   }
 
-  document.getElementById("result-nome").textContent  = dati.nome;
-  document.getElementById("result-desc").textContent  = `Titolare: ${dati.nome} — ${dati.pass}. Credenziale registrata nell'archivio centrale e conforme ai requisiti di validità. Nessuna anomalia rilevata.`;
-  document.getElementById("meta-protocollo").textContent = dati.protocollo;
-  document.getElementById("meta-stato").textContent      = dati.stato;
-  document.getElementById("meta-stato").style.color      = dati.stato === "Attivo" ? "var(--green)" : "var(--gray-600)";
-  document.getElementById("meta-tipo").textContent       = dati.pass;
-  document.getElementById("pill-label").textContent      = "Documento valido";
+  const si = statoInfo(d.stato);
+  const nomeCompleto = [d.nome, d.cognome].filter(Boolean).join(" ") || "—";
+
+  // pill stato
+  const pill = document.getElementById("statusPill");
+  pill.className = "valid-pill " + si.classe;
+  document.getElementById("pill-label").textContent = si.label;
+
+  // nome e soprannome
+  document.getElementById("result-nome").textContent = nomeCompleto;
+  const sopEl = document.getElementById("result-soprannome");
+  sopEl.textContent = d.soprannome ? `"${d.soprannome}"` : "";
+
+  // descrizione
+  document.getElementById("result-desc").textContent = d.descrizione || `Credenziale registrata nell'archivio centrale. Nessuna anomalia rilevata.`;
+
+  // meta principali
+  document.getElementById("meta-codice").textContent    = codice;
+  document.getElementById("meta-categoria").textContent = d.categoria;
+
+  const statoEl = document.getElementById("meta-stato");
+  statoEl.textContent  = si.testo;
+  statoEl.className    = "meta-value " + si.classe;
+
+  // extra
+  document.getElementById("meta-emissione").textContent  = d.dataEmissione;
+  document.getElementById("meta-scadenza").textContent   = d.dataScadenza;
+  document.getElementById("meta-emesso").textContent     = d.emessoDa;
+  document.getElementById("meta-descrizione").textContent= d.descrizione || "—";
+  document.getElementById("meta-note").textContent       = d.note || "—";
 
   const fmt = new Date().toLocaleString("it-IT");
   document.getElementById("ts").textContent        = fmt;
-  document.getElementById("footer-ts").textContent = "Ultimo aggiornamento: " + fmt;
+  document.getElementById("footer-ts").textContent = "Ultimo aggiornamento: "+fmt;
 
   modal.classList.remove("open");
   errorMsg.classList.remove("visible");
-  document.querySelector(".result-card").scrollIntoView({ behavior:"smooth", block:"start" });
+  document.querySelector(".result-card").scrollIntoView({behavior:"smooth",block:"start"});
 }
 </script>
 </body>
