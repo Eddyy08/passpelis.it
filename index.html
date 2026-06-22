@@ -13,6 +13,7 @@
   --blue:#0f172a;--blue-mid:#1e3a5f;--blue-accent:#2563eb;--blue-light:#eff6ff;
   --green:#15803d;--green-bg:#f0fdf4;--green-border:#bbf7d0;
   --orange:#c2410c;--orange-bg:#fff7ed;--orange-border:#fed7aa;
+  --yellow:#a16207;--yellow-bg:#fefce8;--yellow-border:#fde047;
   --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
   --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-400:#94a3b8;
   --gray-600:#475569;--gray-700:#334155;--gray-900:#0f172a;
@@ -47,16 +48,19 @@ body{background:#f1f5f9;font-family:'Inter',sans-serif;min-height:100vh;padding:
 .valid-pill.verde{background:var(--green-bg);border:1px solid var(--green-border)}
 .valid-pill.arancione{background:var(--orange-bg);border:1px solid var(--orange-border)}
 .valid-pill.rosso{background:var(--red-bg);border:1px solid var(--red-border)}
+.valid-pill.giallo{background:var(--yellow-bg);border:1px solid var(--yellow-border)}
 .valid-pill.neutro{background:var(--gray-100);border:1px solid var(--gray-200)}
 .valid-dot{width:7px;height:7px;border-radius:50%}
 .valid-pill.verde .valid-dot{background:var(--green)}
 .valid-pill.arancione .valid-dot{background:var(--orange)}
 .valid-pill.rosso .valid-dot{background:var(--red)}
+.valid-pill.giallo .valid-dot{background:var(--yellow)}
 .valid-pill.neutro .valid-dot{background:var(--gray-400)}
 .valid-label{font-size:13px;font-weight:600}
 .valid-pill.verde .valid-label{color:var(--green)}
 .valid-pill.arancione .valid-label{color:var(--orange)}
 .valid-pill.rosso .valid-label{color:var(--red)}
+.valid-pill.giallo .valid-label{color:var(--yellow)}
 .valid-pill.neutro .valid-label{color:var(--gray-600)}
 
 .result-heading{font-size:22px;font-weight:700;color:var(--gray-900);margin-bottom:2px}
@@ -71,6 +75,7 @@ body{background:#f1f5f9;font-family:'Inter',sans-serif;min-height:100vh;padding:
 .meta-value.verde{color:var(--green)}
 .meta-value.arancione{color:var(--orange)}
 .meta-value.rosso{color:var(--red)}
+.meta-value.giallo{color:var(--yellow)}
 
 .extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--gray-100)}
 .extra-cell{padding:14px 20px;border-right:1px solid var(--gray-100)}
@@ -404,7 +409,7 @@ function parseCSVRow(row) {
 
 function statoInfo(s) {
   if (s === "A") return { classe: "verde",    testo: "Attivo",   label: "Documento valido" };
-  if (s === "S") return { classe: "arancione", testo: "Sospeso",  label: "Documento sospeso" };
+  if (s === "S") return { classe: "giallo",    testo: "Sospeso",  label: "Documento sospeso" };
   if (s === "R") return { classe: "rosso",    testo: "Revocato", label: "Documento revocato" };
   return           { classe: "neutro",    testo: s,          label: "Stato sconosciuto" };
 }
